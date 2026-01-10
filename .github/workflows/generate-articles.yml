@@ -1,0 +1,69 @@
+name: Build and Deploy Site
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - '**/*.md'
+      - 'articles/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout main branch
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Build site
+      run: |
+        python scripts/build.py
+
+        echo "构建完成，内容预览："
+        ls -la docs/_site/
+        echo "articles目录："
+        ls -la docs/_site/articles/
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: static-site
+        path: docs/_site/
+        retention-days: 1
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+    - name: Download build artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: static-site
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+
+    - name: Upload to Pages
+      uses: actions/upload-pages-artifact@v4
+      with:
+        path: '.'
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
