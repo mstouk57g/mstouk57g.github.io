@@ -1,13 +1,38 @@
 {% extends "base.html" %}
 
-{% block content %}
-<!-- 返回按钮 -->
-<div class="mb-8">
-    <a href="/articles/groups/{{ article.group }}/" class="inline-flex items-center glass-card px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
-        <i class="fas fa-arrow-left mr-2"></i> 返回{{ article.group }}分类
-    </a>
-</div>
+{% block nav_buttons %}
+<!-- 文章页面的导航按钮 -->
+<div class="mb-8 flex items-center justify-between">
+    <div class="nav-buttons">
+        <a href="/" class="nav-btn" title="返回首页">
+            <i class="fas fa-home"></i>
+        </a>
+        <a href="/articles/" class="nav-btn" title="所有文章">
+            <i class="fas fa-th-list"></i>
+        </a>
+        <a href="/articles/groups/" class="nav-btn" title="所有分组">
+            <i class="fas fa-folder"></i>
+        </a>
+        <a href="/articles/groups/{{ article.group }}/" class="nav-btn" title="返回分组">
+            <i class="fas fa-folder-open"></i>
+        </a>
+    </div>
 
+    <div class="flex items-center">
+        <span class="text-sm opacity-70 mr-3">当前分组：</span>
+        <span class="px-3 py-1 rounded-full bg-purple-600 bg-opacity-30 text-sm">
+            <i class="fas fa-folder-open mr-1"></i>
+            {% if article.group == 'default' %}
+            默认分组
+            {% else %}
+            {{ article.group }}
+            {% endif %}
+        </span>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
 <!-- 文章头部 -->
 <div class="glass-card rounded-2xl p-8 mb-8">
     <div class="text-center">
@@ -71,42 +96,44 @@
     </div>
 </div>
 
-<!-- 上一篇/下一篇 -->
-<div class="flex flex-col sm:flex-row justify-between gap-4 mb-12">
-    <div class="flex-1">
-        {% if prev_article %}
-        <a href="/articles/groups/{{ article.group }}/{{ prev_article.html_name }}" class="glass-card p-4 rounded-xl hover:bg-white hover:bg-opacity-10 transition block h-full">
-            <div class="text-sm opacity-70 mb-1">
-                <i class="fas fa-chevron-left mr-1"></i>上一篇
+<!-- 导航按钮（上一篇/下一篇） -->
+<div class="flex justify-between items-center gap-4 mb-12">
+    {% if prev_article %}
+    <a href="/articles/groups/{{ article.group }}/{{ prev_article.html_name }}"
+       class="flex-1 glass-card p-4 rounded-xl hover:bg-white hover:bg-opacity-10 transition group">
+        <div class="flex items-center">
+            <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center mr-3">
+                <i class="fas fa-chevron-left"></i>
             </div>
-            <div class="font-bold line-clamp-1">{{ prev_article.title }}</div>
-        </a>
-        {% else %}
-        <div class="glass-card p-4 rounded-xl opacity-50 text-center">
-            <div class="text-sm">已经是第一篇了</div>
-        </div>
-        {% endif %}
-    </div>
-
-    <div class="text-center py-2">
-        <a href="/articles/groups/{{ article.group }}/" class="glass-card px-6 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
-            <i class="fas fa-list mr-2"></i> 文章列表
-        </a>
-    </div>
-
-    <div class="flex-1 text-right">
-        {% if next_article %}
-        <a href="/articles/groups/{{ article.group }}/{{ next_article.html_name }}" class="glass-card p-4 rounded-xl hover:bg-white hover:bg-opacity-10 transition block h-full">
-            <div class="text-sm opacity-70 mb-1 text-right">
-                下一篇<i class="fas fa-chevron-right ml-1"></i>
+            <div class="flex-1 min-w-0">
+                <div class="text-sm opacity-70 mb-1">上一篇</div>
+                <div class="font-bold truncate">{{ prev_article.title }}</div>
             </div>
-            <div class="font-bold line-clamp-1 text-right">{{ next_article.title }}</div>
-        </a>
-        {% else %}
-        <div class="glass-card p-4 rounded-xl opacity-50 text-center">
-            <div class="text-sm">已经是最后一篇了</div>
         </div>
-        {% endif %}
+    </a>
+    {% else %}
+    <div class="flex-1 glass-card p-4 rounded-xl opacity-50 text-center">
+        <div class="text-sm">已经是第一篇了</div>
     </div>
+    {% endif %}
+
+    {% if next_article %}
+    <a href="/articles/groups/{{ article.group }}/{{ next_article.html_name }}"
+       class="flex-1 glass-card p-4 rounded-xl hover:bg-white hover:bg-opacity-10 transition group">
+        <div class="flex items-center">
+            <div class="flex-1 min-w-0 text-right">
+                <div class="text-sm opacity-70 mb-1">下一篇</div>
+                <div class="font-bold truncate">{{ next_article.title }}</div>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center ml-3">
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </div>
+    </a>
+    {% else %}
+    <div class="flex-1 glass-card p-4 rounded-xl opacity-50 text-center">
+        <div class="text-sm">已经是最后一篇了</div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

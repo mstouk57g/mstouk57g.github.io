@@ -1,14 +1,49 @@
 {% extends "base.html" %}
 
+{% block nav_buttons %}
+<!-- 自定义导航按钮 -->
+<div class="mb-8 flex items-center justify-between">
+    <div class="nav-buttons">
+        <a href="/" class="nav-btn" title="返回首页">
+            <i class="fas fa-home"></i>
+        </a>
+        <a href="/articles/" class="nav-btn" title="所有文章">
+            <i class="fas fa-th-list"></i>
+        </a>
+        <a href="/articles/groups/" class="nav-btn" title="所有分组">
+            <i class="fas fa-folder"></i>
+        </a>
+    </div>
+
+    <div class="flex items-center">
+        <span class="text-sm opacity-70 mr-3">当前分组：</span>
+        <span class="px-3 py-1 rounded-full bg-purple-600 bg-opacity-30 text-sm">
+            <i class="fas fa-folder-open mr-1"></i>
+            {% if group_name == 'default' %}
+            默认分组
+            {% else %}
+            {{ group_name }}
+            {% endif %}
+        </span>
+    </div>
+</div>
+{% endblock %}
+
 {% block content %}
-<!-- 页面标题 -->
+<!-- 分组标题 -->
 <div class="text-center mb-12">
-    <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ group_name }}</h1>
-    <p class="text-xl opacity-90" id="articles-count">共 {{ articles|length }} 篇文章</p>
+    <h1 class="text-4xl md:text-5xl font-bold mb-4">
+        {% if group_name == 'default' %}
+        默认分组
+        {% else %}
+        {{ group_name }}
+        {% endif %}
+    </h1>
+    <p class="text-xl opacity-90">共 {{ articles|length }} 篇文章</p>
 </div>
 
 <!-- 文章列表 -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
     {% for article in articles %}
     <div class="article-card glass-card rounded-2xl p-6 cursor-pointer h-full flex flex-col"
          onclick="window.location.href='/articles/groups/{{ group_name }}/{{ article.html_name }}'">
@@ -17,7 +52,7 @@
                 <div class="text-2xl text-purple-300">
                     <i class="fas fa-file-alt"></i>
                 </div>
-                <span class="text-xs opacity-70 bg-black bg-opacity-30 px-2 py-1 rounded" title="{{ article.date }}">
+                <span class="text-xs opacity-70 bg-black bg-opacity-30 px-2 py-1 rounded">
                     {{ article.date }}
                 </span>
             </div>
@@ -48,16 +83,20 @@
     {% endfor %}
 </div>
 
-<!-- 统计信息 -->
+<!-- 分组统计 -->
 <div class="glass-card rounded-2xl p-6 text-center mb-8">
     <div class="flex flex-wrap justify-center gap-8">
         <div>
             <div class="text-3xl font-bold">{{ articles|length }}</div>
-            <div class="text-sm opacity-80">文章总数</div>
+            <div class="text-sm opacity-80">文章数量</div>
         </div>
         <div>
             <div class="text-3xl font-bold">{{ total_words }}</div>
             <div class="text-sm opacity-80">总字数</div>
+        </div>
+        <div>
+            <div class="text-3xl font-bold">{{ total_reading_time }}</div>
+            <div class="text-sm opacity-80">阅读时间(分钟)</div>
         </div>
         <div>
             <div class="text-3xl font-bold">{{ latest_date }}</div>
