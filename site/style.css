@@ -366,3 +366,50 @@
         font-size: 1.125rem;
     }
 }
+
+html {
+    height: 100%;
+    overflow: hidden !important;
+}
+
+body {
+    height: 100%;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    position: relative;
+}
+
+/* 修复背景容器 - 固定不滚动 */
+#background-container {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none; /* 防止背景干扰点击事件 */
+}
+
+#overlay {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    pointer-events: none; /* 防止遮罩层干扰点击事件 */
+}
+
+/* 确保内容在背景之上 */
+main {
+    position: relative;
+    z-index: 20;
+    min-height: 100vh; /* 确保有足够高度可以滚动 */
+}
+
+/* iOS平滑滚动 */
+@media (max-width: 768px) {
+    body {
+        -webkit-overflow-scrolling: touch;
+    }
+}
