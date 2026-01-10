@@ -37,15 +37,15 @@
       "icon": "fas fa-code",
       "type": "modal",
       "modalTitle": "项目展示",
-      "modalContent": "鸽一下，有空弄"
+      "modalContent": "鸽一下，有空弄\n自己去GitHub上看去"
     },
     {
       "id": "blog",
       "text": "技术笔记",
       "icon": "fas fa-blog",
-      "type": "modal",
-      "modalTitle": "技术笔记",
-      "modalContent": "鸽一下，有空弄"
+      "type": "link",
+      "url": "https://mstouk57g.colchicum.moe/articles",
+      "target": "_blank"
     },
     {
       "id": "contact",
