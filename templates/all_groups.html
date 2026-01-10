@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block nav_buttons %}
+<!-- 自定义导航按钮 -->
+<div class="mb-8">
+    <div class="nav-buttons">
+        <a href="/" class="nav-btn" title="返回首页">
+            <i class="fas fa-home"></i>
+        </a>
+        <a href="/articles/" class="nav-btn" title="所有文章">
+            <i class="fas fa-th-list"></i>
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- 页面标题 -->
+<div class="text-center mb-12">
+    <h1 class="text-4xl md:text-5xl font-bold mb-4">所有分组</h1>
+    <p class="text-xl opacity-90">共 {{ groups|length }} 个分类</p>
+</div>
+
+<!-- 分组卡片 -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+    {% for group_name, group_info in groups.items() %}
+    <a href="/articles/groups/{{ group_name }}/"
+       class="glass-card rounded-2xl p-8 hover:scale-[1.02] transition-transform block">
+        <div class="flex items-center justify-between mb-6">
+            <div class="text-3xl text-purple-300">
+                {% if group_name == 'default' %}
+                <i class="fas fa-inbox"></i>
+                {% else %}
+                <i class="fas fa-folder"></i>
+                {% endif %}
+            </div>
+            <span class="text-xs opacity-70 bg-black bg-opacity-30 px-3 py-1 rounded-full">
+                {{ group_info.count }} 篇
+            </span>
+        </div>
+
+        <h3 class="text-2xl font-bold mb-3">
+            {% if group_name == 'default' %}
+            默认分组
+            {% else %}
+            {{ group_name }}
+            {% endif %}
+        </h3>
+
+        {% if group_info.description %}
+        <p class="text-sm opacity-80 mb-4 line-clamp-2">{{ group_info.description }}</p>
+        {% endif %}
+
+        <div class="text-xs opacity-70">
+            <div class="flex items-center">
+                <i class="fas fa-file-word mr-2"></i>
+                <span>{{ group_info.total_words }} 字</span>
+                <span class="mx-2">•</span>
+                <i class="far fa-clock mr-2"></i>
+                <span>阅读约需 {{ group_info.total_reading_time }} 分钟</span>
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+
+<!-- 统计信息 -->
+<div class="glass-card rounded-2xl p-6 text-center mb-8">
+    <div class="flex flex-wrap justify-center gap-8">
+        <div>
+            <div class="text-3xl font-bold">{{ total_articles }}</div>
+            <div class="text-sm opacity-80">文章总数</div>
+        </div>
+        <div>
+            <div class="text-3xl font-bold">{{ groups|length }}</div>
+            <div class="text-sm opacity-80">分组数量</div>
+        </div>
+        <div>
+            <div class="text-3xl font-bold">{{ total_words }}</div>
+            <div class="text-sm opacity-80">总字数</div>
+        </div>
+        <div>
+            <div class="text-3xl font-bold">{{ total_reading_time }}</div>
+            <div class="text-sm opacity-80">总阅读时间(分钟)</div>
+        </div>
+    </div>
+</div>
+
+<!-- 最近更新 -->
+<div class="glass-card rounded-2xl p-6 mb-8">
+    <h3 class="text-xl font-bold mb-4">最近更新</h3>
+    <div class="space-y-3">
+        {% for article in recent_articles %}
+        <a href="/articles/groups/{{ article.group }}/{{ article.html_name }}"
+           class="flex items-center justify-between p-3 rounded-lg hover:bg-white hover:bg-opacity-5 transition">
+            <div class="flex-1">
+                <div class="font-medium">{{ article.title }}</div>
+                <div class="text-xs opacity-70 mt-1">
+                    <span class="mr-3">
+                        <i class="fas fa-folder mr-1"></i>{{ article.group }}
+                    </span>
+                    <span>
+                        <i class="far fa-clock mr-1"></i>{{ article.date }}
+                    </span>
+                </div>
+            </div>
+            <i class="fas fa-chevron-right opacity-50"></i>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

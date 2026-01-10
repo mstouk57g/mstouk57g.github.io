@@ -1,86 +1,139 @@
 {% extends "base.html" %}
 
-{% block content %}
-<!-- 页面标题 -->
-<div class="text-center mb-12">
-    <h1 class="text-4xl md:text-5xl font-bold mb-4">所有文章</h1>
-    <p class="text-xl opacity-90" id="articles-count">共 {{ total_articles }} 篇文章，{{ groups|length }} 个分类</p>
-</div>
-
-<!-- 排序筛选 -->
-<div class="glass-card rounded-xl p-4 mb-8 flex flex-wrap gap-4 justify-center">
-    <button onclick="sortBy('date')" id="sort-date" class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 transition">
-        <i class="fas fa-calendar-alt mr-2"></i>最新
-    </button>
-    <button onclick="sortBy('group')" id="sort-group" class="px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
-        <i class="fas fa-folder mr-2"></i>分类
-    </button>
-    <button onclick="sortBy('words')" id="sort-words" class="px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
-        <i class="fas fa-file-word mr-2"></i>字数
-    </button>
-</div>
-
-<!-- 按分组展示 -->
-{% for group_name, group_articles in groups.items() %}
-<div class="mb-12">
-    <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-bold">
-            {{ group_name }}
-            <span class="text-lg opacity-70">({{ group_articles|length }}篇)</span>
-        </h2>
-        <a href="/articles/groups/{{ group_name }}/" class="text-purple-300 hover:text-purple-400">
-            查看全部 <i class="fas fa-arrow-right ml-1"></i>
+{% block nav_buttons %}
+<!-- 文章页面的导航按钮 -->
+<div class="mb-8 flex items-center justify-between">
+    <div class="nav-buttons">
+        <a href="/" class="nav-btn" title="返回首页">
+            <i class="fas fa-home"></i>
+        </a>
+        <a href="/articles/" class="nav-btn" title="所有文章">
+            <i class="fas fa-th-list"></i>
+        </a>
+        <a href="/articles/groups/" class="nav-btn" title="所有分组">
+            <i class="fas fa-folder"></i>
+        </a>
+        <a href="/articles/groups/{{ article.group }}/" class="nav-btn" title="返回分组">
+            <i class="fas fa-folder-open"></i>
         </a>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {% for article in group_articles[:4] %}
-        <div class="article-card glass-card rounded-2xl p-6 cursor-pointer h-full flex flex-col"
-             onclick="window.location.href='/articles/groups/{{ group_name }}/{{ article.html_name }}'">
-            <div class="flex-1">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="text-2xl text-purple-300">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
-                    <span class="text-xs opacity-70 bg-black bg-opacity-30 px-2 py-1 rounded">
-                        {{ article.date }}
-                    </span>
-                </div>
+    <div class="flex items-center">
+        <span class="text-sm opacity-70 mr-3">当前分组：</span>
+        <span class="px-3 py-1 rounded-full bg-purple-600 bg-opacity-30 text-sm">
+            <i class="fas fa-folder-open mr-1"></i>
+            {% if article.group == 'default' %}
+            默认分组
+            {% else %}
+            {{ article.group }}
+            {% endif %}
+        </span>
+    </div>
+</div>
+{% endblock %}
 
-                <h3 class="text-xl font-bold mb-3 line-clamp-2">{{ article.title }}</h3>
-                <p class="text-sm opacity-80 mb-4 line-clamp-3 flex-1">{{ article.description }}</p>
+{% block content %}
+<!-- 文章头部 -->
+<div class="glass-card rounded-2xl p-8 mb-8">
+    <div class="text-center">
+        <div class="inline-block mb-6">
+            <span class="text-xs uppercase tracking-wider opacity-70 bg-purple-600 bg-opacity-30 px-3 py-1 rounded-full">
+                <i class="far fa-clock mr-1"></i>{{ article.date }}
+            </span>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold mb-6">{{ article.title }}</h1>
+        {% if article.description %}
+        <div class="max-w-2xl mx-auto">
+            <p class="text-xl opacity-90 italic border-l-4 border-purple-500 pl-4 py-2">
+                {{ article.description }}
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 文章内容 -->
+<div class="glass-card rounded-2xl p-8 mb-8">
+    <div class="markdown-content">
+        {{ article.content|safe }}
+    </div>
+</div>
+
+<!-- 文章元信息 -->
+<div class="glass-card rounded-2xl p-6 mb-8">
+    <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-4 md:mb-0 text-center md:text-left">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center mr-3">
+                    <i class="fas fa-user text-lg"></i>
+                </div>
+                <div>
+                    <div class="font-bold">{{ article.author }}</div>
+                    <div class="text-sm opacity-70">作者</div>
+                </div>
             </div>
         </div>
-        {% endfor %}
+
+        <div class="mb-4 md:mb-0 text-center">
+            <div class="flex items-center">
+                <i class="fas fa-file-word text-xl mr-3 text-purple-300"></i>
+                <div>
+                    <div class="font-bold">{{ article.word_count }} 字</div>
+                    <div class="text-sm opacity-70">阅读约需 {{ article.reading_time }} 分钟</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center md:text-right">
+            <div class="flex items-center">
+                <i class="fas fa-code-commit text-xl mr-3 text-purple-300"></i>
+                <div>
+                    <div class="font-bold">{{ article.commit_count }} 次提交</div>
+                    <div class="text-sm opacity-70">最后更新于 {{ article.date }}</div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-{% endfor %}
 
-<!-- 统计信息 -->
-<div class="glass-card rounded-2xl p-6 text-center mb-8">
-    <div class="flex flex-wrap justify-center gap-8">
-        <div>
-            <div class="text-3xl font-bold">{{ total_articles }}</div>
-            <div class="text-sm opacity-80">文章总数</div>
+<!-- 导航按钮（上一篇/下一篇） -->
+<div class="flex justify-between items-center gap-4 mb-12">
+    {% if prev_article %}
+    <a href="/articles/groups/{{ article.group }}/{{ prev_article.html_name }}"
+       class="flex-1 glass-card p-4 rounded-xl hover:bg-white hover:bg-opacity-10 transition group">
+        <div class="flex items-center">
+            <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center mr-3">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="text-sm opacity-70 mb-1">上一篇</div>
+                <div class="font-bold truncate">{{ prev_article.title }}</div>
+            </div>
         </div>
-        <div>
-            <div class="text-3xl font-bold">{{ total_words }}</div>
-            <div class="text-sm opacity-80">总字数</div>
-        </div>
-        <div>
-            <div class="text-3xl font-bold">{{ groups|length }}</div>
-            <div class="text-sm opacity-80">分类数量</div>
-        </div>
+    </a>
+    {% else %}
+    <div class="flex-1 glass-card p-4 rounded-xl opacity-50 text-center">
+        <div class="text-sm">已经是第一篇了</div>
     </div>
+    {% endif %}
+
+    {% if next_article %}
+    <a href="/articles/groups/{{ article.group }}/{{ next_article.html_name }}"
+       class="flex-1 glass-card p-4 rounded-xl hover:bg-white hover:bg-opacity-10 transition group">
+        <div class="flex items-center">
+            <div class="flex-1 min-w-0 text-right">
+                <div class="text-sm opacity-70 mb-1">下一篇</div>
+                <div class="font-bold truncate">{{ next_article.title }}</div>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center ml-3">
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </div>
+    </a>
+    {% else %}
+    <div class="flex-1 glass-card p-4 rounded-xl opacity-50 text-center">
+        <div class="text-sm">已经是最后一篇了</div>
+    </div>
+    {% endif %}
 </div>
-
-<script>
-let currentSort = 'date';
-let allArticles = {{ all_articles_json|safe }};
-
-function sortBy(type) {
-    currentSort = type;
-    // 排序逻辑...
-}
-</script>
 {% endblock %}
