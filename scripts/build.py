@@ -177,6 +177,17 @@ def fetch_articles():
             shutil.rmtree(temp_save)
         shutil.copytree(temp_dir, temp_save)
 
+        # 将根目录的.md文件移动到default文件夹
+        default_dir = temp_save / "default"
+        default_dir.mkdir(exist_ok=True)
+
+        # 移动根目录的.md文件到default文件夹
+        for md_file in temp_save.glob("*.md"):
+            if md_file.is_file():
+                target_path = default_dir / md_file.name
+                shutil.move(str(md_file), str(target_path))
+                print(f"📁 移动文件: {md_file.name} -> default/")
+
         shutil.rmtree(temp_dir)
 
         print(f"✓ 拉取完成: {len(all_articles)} 篇文章，{len(articles_by_group)} 个分组")
