@@ -1,60 +1,87 @@
 {% extends "base.html" %}
 
+{% block nav_buttons %}
+<!-- 所有文章页的导航按钮 -->
+<div class="mb-8">
+    <div class="nav-buttons">
+        <a href="/" class="nav-btn" title="返回首页">
+            <i class="fas fa-home"></i>
+        </a>
+        <a href="/articles/groups/" class="nav-btn" title="所有分组">
+            <i class="fas fa-folder"></i>
+        </a>
+    </div>
+</div>
+{% endblock %}
+
 {% block content %}
 <!-- 页面标题 -->
 <div class="text-center mb-12">
     <h1 class="text-4xl md:text-5xl font-bold mb-4">所有文章</h1>
-    <p class="text-xl opacity-90" id="articles-count">共 {{ total_articles }} 篇文章，{{ groups|length }} 个分类</p>
+    <p class="text-xl opacity-90">共 {{ total_articles }} 篇文章</p>
 </div>
 
 <!-- 排序筛选 -->
 <div class="glass-card rounded-xl p-4 mb-8 flex flex-wrap gap-4 justify-center">
-    <button onclick="sortBy('date')" id="sort-date" class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 transition">
+    <button onclick="sortArticles('date')" class="sort-btn px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-10 transition" data-sort="date">
         <i class="fas fa-calendar-alt mr-2"></i>最新
     </button>
-    <button onclick="sortBy('group')" id="sort-group" class="px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
-        <i class="fas fa-folder mr-2"></i>分类
-    </button>
-    <button onclick="sortBy('words')" id="sort-words" class="px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
+    <button onclick="sortArticles('words')" class="sort-btn px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-10 transition" data-sort="words">
         <i class="fas fa-file-word mr-2"></i>字数
+    </button>
+    <button onclick="sortArticles('group')" class="sort-btn px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-10 transition" data-sort="group">
+        <i class="fas fa-folder mr-2"></i>分类
     </button>
 </div>
 
-<!-- 按分组展示 -->
-{% for group_name, group_articles in groups.items() %}
-<div class="mb-12">
-    <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-bold">
-            {{ group_name }}
-            <span class="text-lg opacity-70">({{ group_articles|length }}篇)</span>
-        </h2>
-        <a href="/articles/groups/{{ group_name }}/" class="text-purple-300 hover:text-purple-400">
-            查看全部 <i class="fas fa-arrow-right ml-1"></i>
-        </a>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {% for article in group_articles[:4] %}
-        <div class="article-card glass-card rounded-2xl p-6 cursor-pointer h-full flex flex-col"
-             onclick="window.location.href='/articles/groups/{{ group_name }}/{{ article.html_name }}'">
-            <div class="flex-1">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="text-2xl text-purple-300">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
+<!-- 文章列表 -->
+<div id="articles-container" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+    {% for article in all_articles %}
+    <div class="article-card glass-card rounded-2xl p-6 cursor-pointer h-full flex flex-col"
+         data-date="{{ article.date }}"
+         data-words="{{ article.word_count }}"
+         data-group="{{ article.group }}"
+         onclick="window.location.href='/articles/groups/{{ article.group }}/{{ article.html_name }}'">
+        <div class="flex-1">
+            <div class="flex items-center justify-between mb-4">
+                <div class="text-2xl text-purple-300">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs opacity-70 bg-purple-600 bg-opacity-30 px-2 py-1 rounded">
+                        {% if article.group == 'default' %}默认{% else %}{{ article.group }}{% endif %}
+                    </span>
                     <span class="text-xs opacity-70 bg-black bg-opacity-30 px-2 py-1 rounded">
                         {{ article.date }}
                     </span>
                 </div>
+            </div>
 
-                <h3 class="text-xl font-bold mb-3 line-clamp-2">{{ article.title }}</h3>
-                <p class="text-sm opacity-80 mb-4 line-clamp-3 flex-1">{{ article.description }}</p>
+            <h3 class="text-xl font-bold mb-3 line-clamp-2">{{ article.title }}</h3>
+            <p class="text-sm opacity-80 mb-4 line-clamp-3 flex-1">{{ article.description }}</p>
+        </div>
+
+        <div class="border-t border-white border-opacity-20 pt-4 mt-4">
+            <div class="flex justify-between items-center text-xs">
+                <div class="flex items-center" title="作者">
+                    <i class="fas fa-user-circle mr-1 opacity-70"></i>
+                    <span class="opacity-80">{{ article.author }}</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="flex items-center" title="字数">
+                        <i class="fas fa-file-word mr-1 opacity-70"></i>
+                        <span class="opacity-80">{{ article.word_count }}</span>
+                    </div>
+                    <div class="flex items-center" title="提交次数">
+                        <i class="fas fa-code-commit mr-1 opacity-70"></i>
+                        <span class="opacity-80">{{ article.commit_count }}</span>
+                    </div>
+                </div>
             </div>
         </div>
-        {% endfor %}
     </div>
+    {% endfor %}
 </div>
-{% endfor %}
 
 <!-- 统计信息 -->
 <div class="glass-card rounded-2xl p-6 text-center mb-8">
@@ -68,19 +95,88 @@
             <div class="text-sm opacity-80">总字数</div>
         </div>
         <div>
-            <div class="text-3xl font-bold">{{ groups|length }}</div>
+            <div class="text-3xl font-bold">{{ group_count }}</div>
             <div class="text-sm opacity-80">分类数量</div>
+        </div>
+        <div>
+            <div class="text-3xl font-bold">{{ total_reading_time }}</div>
+            <div class="text-sm opacity-80">总阅读时间(分钟)</div>
         </div>
     </div>
 </div>
 
-<script>
-let currentSort = 'date';
-let allArticles = {{ all_articles_json|safe }};
+<!-- 按分组统计 -->
+<div class="glass-card rounded-2xl p-6 mb-8">
+    <h3 class="text-xl font-bold mb-4">按分类统计</h3>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {% for group_name, group_info in groups_info.items() %}
+        <a href="/articles/groups/{{ group_name }}/"
+           class="flex flex-col items-center p-4 rounded-lg hover:bg-white hover:bg-opacity-5 transition">
+            <div class="text-2xl text-purple-300 mb-2">
+                {% if group_name == 'default' %}
+                <i class="fas fa-inbox"></i>
+                {% else %}
+                <i class="fas fa-folder"></i>
+                {% endif %}
+            </div>
+            <div class="text-center">
+                <div class="font-bold">
+                    {% if group_name == 'default' %}
+                    默认
+                    {% else %}
+                    {{ group_name }}
+                    {% endif %}
+                </div>
+                <div class="text-sm opacity-70">{{ group_info.count }} 篇</div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
 
-function sortBy(type) {
-    currentSort = type;
-    // 排序逻辑...
+<script>
+// 文章排序功能
+function sortArticles(type) {
+    const container = document.getElementById('articles-container');
+    const articles = Array.from(container.children);
+
+    // 更新按钮状态
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+        btn.classList.remove('bg-purple-600', 'hover:bg-purple-700');
+        btn.classList.add('hover:bg-white', 'hover:bg-opacity-10');
+    });
+    event.target.classList.add('bg-purple-600', 'hover:bg-purple-700');
+    event.target.classList.remove('hover:bg-white', 'hover:bg-opacity-10');
+
+    // 排序逻辑
+    articles.sort((a, b) => {
+        if (type === 'date') {
+            return new Date(b.dataset.date) - new Date(a.dataset.date);
+        } else if (type === 'words') {
+            return parseInt(b.dataset.words) - parseInt(a.dataset.words);
+        } else if (type === 'group') {
+            return a.dataset.group.localeCompare(b.dataset.group);
+        }
+        return 0;
+    });
+
+    // 重新排列
+    articles.forEach(article => container.appendChild(article));
 }
+
+// 初始按日期排序
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelector('[data-sort="date"]').classList.add('bg-purple-600', 'hover:bg-purple-700');
+    document.querySelector('[data-sort="date"]').classList.remove('hover:bg-white', 'hover:bg-opacity-10');
+});
 </script>
+
+<style>
+.sort-btn.bg-purple-600 {
+    background-color: rgba(147, 51, 234, 0.6);
+}
+.sort-btn.bg-purple-600:hover {
+    background-color: rgba(147, 51, 234, 0.8);
+}
+</style>
 {% endblock %}

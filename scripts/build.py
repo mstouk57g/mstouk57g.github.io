@@ -223,6 +223,34 @@ def generate_all_groups_page(env, groups_info, build_dir):
     (groups_dir / "index.html").write_text(content, encoding='utf-8')
     print("✓ 生成: /articles/groups/index.html")
 
+def generate_all_articles_page(env, all_articles, groups_info, build_dir):
+    """生成所有文章页面"""
+    template = env.get_template("all_articles.html")
+
+    # 计算统计数据
+    total_words = sum(a['word_count'] for a in all_articles)
+    total_reading_time = sum(a['reading_time'] for a in all_articles)
+
+    context = {
+        'title': '所有文章',
+        'all_articles': all_articles,
+        'groups_info': groups_info,
+        'total_articles': len(all_articles),
+        'total_words': total_words,
+        'total_reading_time': total_reading_time,
+        'group_count': len(groups_info),
+        'current_year': datetime.now().year,
+        'build_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    }
+
+    content = template.render(**context)
+
+    articles_dir = build_dir / "articles"
+    articles_dir.mkdir(parents=True, exist_ok=True)
+
+    (articles_dir / "index.html").write_text(content, encoding='utf-8')
+    print("✓ 生成: /articles/index.html")
+
 def build_with_templates():
     """使用模板构建站点"""
     print("🚀 开始模板构建...")
@@ -278,6 +306,10 @@ def build_with_templates():
     # 5. 生成每个分组页面
     print("\n📂 生成分组页面...")
     temp_articles_dir = Path("temp_articles")
+
+    # 6. 生成所有文章页面
+    print("\n📄 生成所有文章页面...")
+    generate_all_articles_page(env, all_articles, groups_info, build_dir)
 
     for group_name, articles in articles_by_group.items():
         # 分组首页
