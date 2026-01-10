@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - mstouk57gの小站</title>
+
+    <!-- 原有所有CSS和JS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .glass-card {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .btn-hover-effect {
+            transition: all 0.3s ease;
+        }
+        .btn-hover-effect:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .fade-in {
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .markdown-content { line-height: 1.8; font-size: 1.125rem; }
+        .markdown-content h1 { font-size: 2.5rem; font-weight: 800; margin: 2.5rem 0 1.5rem; padding-bottom: 0.5rem; border-bottom: 3px solid rgba(255, 255, 255, 0.1); }
+        .markdown-content h2 { font-size: 2rem; font-weight: 700; margin: 2rem 0 1rem; padding-bottom: 0.25rem; border-bottom: 2px solid rgba(255, 255, 255, 0.08); }
+        .markdown-content pre {
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+        .markdown-content a {
+            color: #93c5fd;
+            text-decoration: none;
+            border-bottom: 1px dashed #93c5fd;
+            transition: all 0.2s;
+        }
+        .markdown-content a:hover {
+            color: #60a5fa;
+            border-bottom-style: solid;
+        }
+        .error-code {
+            font-size: 10rem;
+            line-height: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        @media (max-width: 768px) {
+            .error-code {
+                font-size: 6rem;
+            }
+        }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Highlight.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+</head>
+<body class="text-white min-h-screen flex flex-col items-center justify-start overflow-hidden">
+    <!-- 背景 -->
+    <div id="background-container" class="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"></div>
+    <div id="overlay" class="fixed inset-0 z-10"></div>
+
+    <main class="relative z-20 w-full max-w-6xl px-4 py-8 fade-in">
+        <!-- 导航栏 -->
+        {% include "partials/nav.html" %}
+
+        <!-- 主要内容 -->
+        {% block content %}{% endblock %}
+
+        <!-- 页脚 -->
+        {% include "partials/footer.html" %}
+    </main>
+
+    <!-- 背景加载脚本 -->
+    <script>
+        async function loadBackground() {
+            try {
+                const response = await fetch('https://www.loliapi.com/acg/pc/?type=json');
+                const data = await response.json();
+                document.getElementById('background-container').style.backgroundImage = `url('${data.url}')`;
+                document.getElementById('overlay').style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+            } catch (error) {
+                document.getElementById('background-container').style.backgroundImage = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                document.getElementById('overlay').style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', loadBackground);
+
+        // 代码高亮
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('pre code').forEach((el) => {
+                hljs.highlightElement(el);
+            });
+        });
+    </script>
+</body>
+</html>
