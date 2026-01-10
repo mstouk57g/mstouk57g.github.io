@@ -2,10 +2,10 @@ name: Build and Deploy Static Site
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, articles ]
     paths-ignore:
       - '**/*.md'
-      - 'docs/articles/**'  # 忽略生成的articles目录
+      - 'site/articles/**'
   workflow_dispatch:
 
 jobs:
@@ -33,13 +33,13 @@ jobs:
         python scripts/build.py
 
         echo "构建完成，内容预览："
-        find docs/_site -type f -name "*.html" | head -20
+        find site/_site -type f -name "*.html" | head -20
 
     - name: Upload build artifact
       uses: actions/upload-artifact@v4
       with:
         name: static-html-site
-        path: docs/_site/
+        path: site/_site/
         retention-days: 1
 
   deploy:
