@@ -6,8 +6,6 @@ on:
     paths-ignore:
       - '**/*.md'
       - 'docs/articles/**'  # 忽略生成的articles目录
-  schedule:
-    - cron: '0 0 * * *'  # 每天UTC 0点自动构建
   workflow_dispatch:
 
 jobs:

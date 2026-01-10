@@ -258,7 +258,7 @@ def build_with_templates():
 
     # 初始化
     env = init_jinja()
-    build_dir = Path("docs/_site")
+    build_dir = Path("site/_site")
 
     # 清理
     if build_dir.exists():
@@ -274,7 +274,7 @@ def build_with_templates():
 
     # 2. 复制静态文件
     print("\n📋 复制静态文件...")
-    source_dir = Path("docs")
+    source_dir = Path("site")
     for item in source_dir.iterdir():
         if item.name in ['_site', 'articles']:
             continue
@@ -373,6 +373,16 @@ def build_with_templates():
 
     # 7. 创建.nojekyll
     (build_dir / ".nojekyll").touch()
+
+    # 8. 复制配置文件到网站根目录
+    root_files = ["CNAME", "config.json"]
+    for filename in root_files:
+        file_path = Path(filename)
+        if file_path.exists():
+            shutil.copy2(file_path, build_dir / filename)
+            print(f"✓ 复制: {filename} -> {build_dir}/{filename}")
+        else:
+            print(f"⚠ {filename} 文件不存在")
 
     print("\n" + "=" * 50)
     print("🎉 模板构建完成!")
