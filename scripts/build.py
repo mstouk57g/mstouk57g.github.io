@@ -41,32 +41,44 @@ def init_jinja():
 def get_git_info(file_path):
     """获取Git信息"""
     try:
+        # 获取文件所在的Git仓库根目录
+        repo_root = file_path.parent
+
         # 第一次提交的作者（原作者）
-        cmd = ['git', 'log', '--reverse', '--format=%an', '--', str(file_path)]
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        cmd = ['git', 'log', '--reverse', '--format=%an', '--', str(file_path.name)]
+        result = subprocess.run(cmd, cwd=repo_root, capture_output=True, text=True)
         first_author_line = result.stdout.strip().split('\n')[0] if result.returncode == 0 and result.stdout.strip() else None
         author_name = first_author_line if first_author_line else None
 
         # 第一次提交的邮箱
-        cmd = ['git', 'log', '--reverse', '--format=%ae', '--', str(file_path)]
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        cmd = ['git', 'log', '--reverse', '--format=%ae', '--', str(file_path.name)]
+        result = subprocess.run(cmd, cwd=repo_root, capture_output=True, text=True)
         first_email_line = result.stdout.strip().split('\n')[0] if result.returncode == 0 and result.stdout.strip() else None
         author_email = first_email_line if first_email_line else None
 
         # 最后一次修改时间
-        cmd = ['git', 'log', '-1', '--format=%cd', '--date=short', '--', str(file_path)]
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        cmd = ['git', 'log', '-1', '--format=%cd', '--date=short', '--', str(file_path.name)]
+        result = subprocess.run(cmd, cwd=repo_root, capture_output=True, text=True)
         last_modified = result.stdout.strip() if result.returncode == 0 else datetime.now().strftime('%Y-%m-%d')
 
         # 提交次数
-        cmd = ['git', 'log', '--oneline', '--', str(file_path)]
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        cmd = ['git', 'log', '--oneline', '--', str(file_path.name)]
+        result = subprocess.run(cmd, cwd=repo_root, capture_output=True, text=True)
         commit_count = len([line for line in result.stdout.strip().split('\n') if line])
 
         # 获取作者头像URL
         avatar_url = ''
         if author_name:
             avatar_url = f"https://avatars.githubusercontent.com/{author_name}"
+
+        print()
+        print(f"{file_path} 的统计信息")
+        print(f"lastModified: {last_modified}")
+        print(f"commitCount: {commit_count}")
+        print(f"author: {author_name}")
+        print(f"author_email: {author_email}")
+        print(f"avatar_url: {avatar_url}")
+        print("============")
 
         return {
             'lastModified': last_modified,
