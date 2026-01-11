@@ -349,9 +349,10 @@ def generate_all_articles_page(env, all_articles, groups_info, build_dir):
         print(f"✗ 生成所有文章页面失败: {e}")
         return False
 
-def generate_group_pages(env, articles_by_group, build_dir):
+def generate_group_pages(env, articles_by_group, build_dir, config):
     """生成分组页面"""
     temp_articles_dir = Path("temp_articles")
+    site_title = config['site']['title']
 
     for group_name, articles in articles_by_group.items():
         try:
@@ -380,12 +381,12 @@ def generate_group_pages(env, articles_by_group, build_dir):
             print(f"✓ 生成: /articles/groups/{group_name}/")
 
             # 分组内的文章详情页
-            generate_article_pages(env, articles, group_name, group_dir, temp_articles_dir)
+            generate_article_pages(env, articles, group_name, group_dir, temp_articles_dir, site_title)
 
         except Exception as e:
             print(f"✗ 生成分组 '{group_name}' 页面失败: {e}")
 
-def generate_article_pages(env, articles, group_name, group_dir, temp_articles_dir):
+def generate_article_pages(env, articles, group_name, group_dir, temp_articles_dir, site_title):
     """生成文章详情页面"""
     for i, article in enumerate(articles):
         try:
@@ -406,7 +407,7 @@ def generate_article_pages(env, articles, group_name, group_dir, temp_articles_d
                 # 生成文章页面
                 template = env.get_template("article_detail.html")
                 context = {
-                    'title': article['title'],
+                    'title': f"{article['title']} - {site_title}",
                     'article': article,
                     'prev_article': prev_article,
                     'next_article': next_article,
@@ -537,7 +538,7 @@ def build_with_templates():
 
         # 7. 生成分组页面
         print("\n📂 生成分组页面...")
-        generate_group_pages(env, articles_by_group, build_dir)
+        generate_group_pages(env, articles_by_group, build_dir, config)
     else:
         print("⚠ 没有文章可构建，跳过文章相关页面")
 
