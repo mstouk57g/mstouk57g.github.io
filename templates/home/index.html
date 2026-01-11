@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="home-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ site.defaultTitle }} | {{ site.title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="text-white min-h-screen flex flex-col items-center justify-center">
+    <!-- background -->
+    <div id="background-container" class="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"></div>
+    <div id="overlay" class="fixed inset-0 z-10" style="background-color: rgba(0, 0, 0, {{ styles.overlayOpacity / 100 }});"></div>
+
+    <!-- content -->
+    <main class="relative z-20 w-full max-w-4xl px-4 py-8 text-center fade-in">
+        <!-- Title -->
+        <div class="mb-10">
+            <h1 class="text-5xl md:text-7xl font-bold mb-4 tracking-tight text-white">
+                {{ site.title }}
+            </h1>
+            <p class="text-xl md:text-2xl mb-2">
+                {{ site.subtitle }}
+            </p>
+            <p class="text-lg">
+                <i class="fas fa-user mr-2"></i>
+                {{ site.name }}
+                <span class="mx-2">•</span>
+                <i class="fab fa-github mr-2"></i>
+                {{ site.username }}
+            </p>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex flex-wrap justify-center gap-6 mb-12">
+            {% for button in buttons %}
+            {% if button.type == 'link' %}
+            <a href="{{ button.url }}"
+               target="{{ button.target or '_self' }}"
+               class="btn-hover-effect glass-card border-2 rounded-full px-8 py-3 text-lg font-medium text-white hover:bg-white hover:bg-opacity-10 hover:border-opacity-100 flex items-center"
+               style="border-color: rgba(255, 255, 255, {{ styles.buttonBorderOpacity / 100 }});">
+                <i class="{{ button.icon }} mr-3 text-xl"></i>
+                {{ button.text }}
+            </a>
+            {% else %}
+            <button type="button"
+                    class="btn-hover-effect glass-card border-2 rounded-full px-8 py-3 text-lg font-medium text-white hover:bg-white hover:bg-opacity-10 hover:border-opacity-100 flex items-center"
+                    style="border-color: rgba(255, 255, 255, {{ styles.buttonBorderOpacity / 100 }});"
+                    onclick="showModal('{{ button.modalTitle }}', `{{ button.modalContent|replace('\n', '\\n')|safe }}`)">
+                <i class="{{ button.icon }} mr-3 text-xl"></i>
+                {{ button.text }}
+            </button>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Description -->
+        <div class="glass-card rounded-2xl p-6 max-w-2xl mx-auto mb-8">
+            <p class="text-lg leading-relaxed" style="opacity: {{ styles.textOpacity / 100 }};">
+                {{ site.description }}
+            </p>
+        </div>
+
+        <!-- Social Links -->
+        <div class="flex justify-center space-x-6 text-2xl">
+            {% for link in socialLinks %}
+            <a href="{{ link.url }}"
+               target="_blank"
+               class="opacity-80 hover:opacity-100 transition {{ link.color }}">
+                <i class="{{ link.icon }}"></i>
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Background Information -->
+        <div class="mt-10 text-sm" style="opacity: {{ styles.textOpacity / 100 }};">
+            <p>当前背景图片来自 <a href="https://www.loliapi.com/" target="_blank" class="underline hover:opacity-100">LoliAPI</a> •
+            <button id="change-bg-btn" class="underline hover:opacity-100" onclick="loadRandomBackground()">更换背景</button> •
+            <span id="image-info">正在加载...</span></p>
+        </div>
+    </main>
+
+    <!-- modal window -->
+    <div id="modal" class="hidden fixed inset-0 z-30 flex items-center justify-center p-4">
+        <div class="glass-card rounded-2xl p-8 max-w-md w-full">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold" id="modal-title">标题</h3>
+                <button onclick="hideModal()" class="text-2xl hover:opacity-70">&times;</button>
+            </div>
+            <div id="modal-content">内容</div>
+        </div>
+    </div>
+
+    <script>
+        // 配置信息（从模板传递）
+        const config = {
+            background: {{ background|tojson|safe }},
+            styles: {{ styles|tojson|safe }}
+        };
+
+        // DOM元素引用
+        const backgroundContainer = document.getElementById('background-container');
+        const overlay = document.getElementById('overlay');
+        const imageInfo = document.getElementById('image-info');
+        const changeBgBtn = document.getElementById('change-bg-btn');
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalContent = document.getElementById('modal-content');
+
+        // 显示模态框
+        function showModal(title, content) {
+            modalTitle.textContent = title;
+            modalContent.innerHTML = content;
+            modal.classList.remove('hidden');
+        }
+
+        // 隐藏模态框
+        function hideModal() {
+            modal.classList.add('hidden');
+        }
+
+        // 点击模态框外部关闭
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                hideModal();
+            }
+        });
+
+        // 加载随机背景图片
+        async function loadRandomBackground() {
+            try {
+                imageInfo.textContent = '加载中...';
+                changeBgBtn.disabled = true;
+
+                const response = await fetch(config.background.apiUrl);
+                const data = await response.json();
+
+                // 设置背景图片
+                backgroundContainer.style.backgroundImage = `url('${data.url}')`;
+                imageInfo.textContent = `尺寸: ${data.width} × ${data.height}`;
+
+                // 添加淡入效果
+                backgroundContainer.style.opacity = 0;
+                setTimeout(() => {
+                    backgroundContainer.style.opacity = 1;
+                }, 50);
+
+                // 保存到本地存储
+                localStorage.setItem('lastBackgroundUrl', data.url);
+
+            } catch (error) {
+                console.error('加载背景图片失败:', error);
+                imageInfo.textContent = '加载失败，使用默认背景';
+                backgroundContainer.style.backgroundImage = config.background.defaultBackground;
+
+                // 检查是否有上次保存的背景
+                const lastBackground = localStorage.getItem('lastBackgroundUrl');
+                if (lastBackground) {
+                    backgroundContainer.style.backgroundImage = `url('${lastBackground}')`;
+                    imageInfo.textContent = '使用上次的缓存背景';
+                }
+            } finally {
+                changeBgBtn.disabled = false;
+            }
+        }
+
+        // 页面加载时加载背景
+        document.addEventListener('DOMContentLoaded', () => {
+            // 检查本地存储中的背景
+            const lastBackground = localStorage.getItem('lastBackgroundUrl');
+            if (lastBackground) {
+                backgroundContainer.style.backgroundImage = `url('${lastBackground}')`;
+                imageInfo.textContent = '使用缓存背景';
+            } else {
+                loadRandomBackground();
+            }
+        });
+    </script>
+</body>
+</html>

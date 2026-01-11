@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-基于模板的构建脚本 - 修正版
+构建网站
 """
 
 import os
@@ -19,12 +19,19 @@ def init_jinja():
     """初始化Jinja2模板引擎"""
     templates_dir = Path("templates")
     if not templates_dir.exists():
-        # 创建模板目录
         templates_dir.mkdir(exist_ok=True)
         print("⚠ 创建模板目录: templates/")
+    for subdir in ["home", "articles"]:
+        subdir_path = templates_dir / subdir
+        if not subdir_path.exists():
+            subdir_path.mkdir(exist_ok=True)
+            print(f"⚠ 创建模板子目录: templates/{subdir}/")
 
     env = Environment(
-        loader=FileSystemLoader(templates_dir),
+        loader=FileSystemLoader([
+            str(templates_dir / "home"),
+            str(templates_dir / "articles")
+        ]),
         trim_blocks=True,
         lstrip_blocks=True
     )
@@ -199,156 +206,148 @@ def fetch_articles():
             shutil.rmtree(temp_dir)
         return [], {}
 
-def generate_all_groups_page(env, groups_info, build_dir):
-    """生成所有分组页面"""
-    template = env.get_template("all_groups.html")
+def generate_home_page(env, config, build_dir):
+    """生成主页"""
+    try:
+        template = env.get_template("index.html")
 
-    # 计算统计数据
-    total_articles = sum(info['count'] for info in groups_info.values())
-    total_words = sum(info['total_words'] for info in groups_info.values())
-    total_reading_time = sum(info['total_reading_time'] for info in groups_info.values())
-
-    # 获取最近更新的文章（前5篇）
-    all_articles = []
-    for group_name, info in groups_info.items():
-        all_articles.extend(info['articles'])
-    all_articles.sort(key=lambda x: x['date'], reverse=True)
-    recent_articles = all_articles[:5]
-
-    context = {
-        'title': '所有分组',
-        'groups': groups_info,
-        'total_articles': total_articles,
-        'total_words': total_words,
-        'total_reading_time': total_reading_time,
-        'recent_articles': recent_articles,
-        'current_year': datetime.now().year,
-        'build_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    }
-
-    content = template.render(**context)
-
-    groups_dir = build_dir / "articles" / "groups"
-    groups_dir.mkdir(parents=True, exist_ok=True)
-
-    (groups_dir / "index.html").write_text(content, encoding='utf-8')
-    print("✓ 生成: /articles/groups/index.html")
-
-def generate_all_articles_page(env, all_articles, groups_info, build_dir):
-    """生成所有文章页面"""
-    template = env.get_template("all_articles.html")
-
-    # 计算统计数据
-    total_words = sum(a['word_count'] for a in all_articles)
-    total_reading_time = sum(a['reading_time'] for a in all_articles)
-
-    context = {
-        'title': '所有文章',
-        'all_articles': all_articles,
-        'groups_info': groups_info,
-        'total_articles': len(all_articles),
-        'total_words': total_words,
-        'total_reading_time': total_reading_time,
-        'group_count': len(groups_info),
-        'current_year': datetime.now().year,
-        'build_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    }
-
-    content = template.render(**context)
-
-    articles_dir = build_dir / "articles"
-    articles_dir.mkdir(parents=True, exist_ok=True)
-
-    (articles_dir / "index.html").write_text(content, encoding='utf-8')
-    print("✓ 生成: /articles/index.html")
-
-def build_with_templates():
-    """使用模板构建站点"""
-    print("🚀 开始模板构建...")
-    print("=" * 50)
-
-    # 初始化
-    env = init_jinja()
-    build_dir = Path("site/_site")
-
-    # 清理
-    if build_dir.exists():
-        shutil.rmtree(build_dir)
-    build_dir.mkdir(parents=True)
-
-    # 1. 拉取文章
-    all_articles, articles_by_group = fetch_articles()
-
-    if not all_articles:
-        print("⚠ 没有文章，构建失败")
-        return False
-
-    # 2. 复制静态文件
-    print("\n📋 复制静态文件...")
-    source_dir = Path("site")
-    for item in source_dir.iterdir():
-        if item.name in ['_site', 'articles']:
-            continue
-        if item.is_file():
-            shutil.copy2(item, build_dir / item.name)
-        elif item.is_dir():
-            shutil.copytree(item, build_dir / item.name, dirs_exist_ok=True)
-
-    # 3. 准备分组信息
-    groups_info = {}
-    for group_name, articles in articles_by_group.items():
-        total_words = sum(a['word_count'] for a in articles)
-        total_reading_time = sum(a['reading_time'] for a in articles)
-        latest_date = max((a['date'] for a in articles), default='')
-
-        groups_info[group_name] = {
-            'count': len(articles),
-            'total_words': total_words,
-            'total_reading_time': total_reading_time,
-            'latest_date': latest_date,
-            'articles': articles,
-            'description': f"{group_name} 分类的文章"
-        }
-
-    # 4. 生成所有分组页面
-    print("\n📁 生成所有分组页面...")
-    generate_all_groups_page(env, groups_info, build_dir)
-
-    # 5. 生成每个分组页面
-    print("\n📂 生成分组页面...")
-    temp_articles_dir = Path("temp_articles")
-
-    # 6. 生成所有文章页面
-    print("\n📄 生成所有文章页面...")
-    generate_all_articles_page(env, all_articles, groups_info, build_dir)
-
-    for group_name, articles in articles_by_group.items():
-        # 分组首页
-        total_words = sum(a['word_count'] for a in articles)
-        total_reading_time = sum(a['reading_time'] for a in articles)
-        latest_date = max((a['date'] for a in articles), default='')
-
-        template = env.get_template("group_index.html")
         context = {
-            'title': f'{group_name} - 文章分类' if group_name != 'default' else '默认分组 - 文章分类',
-            'group_name': group_name,
-            'current_group': group_name,
-            'articles': articles,
-            'total_words': total_words,
-            'total_reading_time': total_reading_time,
-            'latest_date': latest_date,
+            'site': config['site'],
+            'buttons': config['buttons'],
+            'socialLinks': config['socialLinks'],
+            'background': config['background'],
+            'styles': config['styles'],
+            'title': config['site']['title'],
             'current_year': datetime.now().year,
             'build_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
 
-        group_dir = build_dir / "articles" / "groups" / group_name
-        group_dir.mkdir(parents=True, exist_ok=True)
+        content = template.render(**context)
+        (build_dir / "index.html").write_text(content, encoding='utf-8')
+        print("✓ 生成: /index.html")
+        return True
 
-        (group_dir / "index.html").write_text(template.render(**context), encoding='utf-8')
-        print(f"✓ 生成: /articles/groups/{group_name}/")
+    except Exception as e:
+        print(f"✗ 生成主页失败: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
 
-        # 分组内的文章
-        for i, article in enumerate(articles):
+def generate_all_groups_page(env, groups_info, build_dir):
+    """生成所有分组页面"""
+    try:
+        template = env.get_template("all_groups.html")
+
+        # 计算统计数据
+        total_articles = sum(info['count'] for info in groups_info.values())
+        total_words = sum(info['total_words'] for info in groups_info.values())
+        total_reading_time = sum(info['total_reading_time'] for info in groups_info.values())
+
+        # 获取最近更新的文章（前5篇）
+        all_articles = []
+        for group_name, info in groups_info.items():
+            all_articles.extend(info['articles'])
+        all_articles.sort(key=lambda x: x['date'], reverse=True)
+        recent_articles = all_articles[:5]
+
+        context = {
+            'title': '所有分组',
+            'groups': groups_info,
+            'total_articles': total_articles,
+            'total_words': total_words,
+            'total_reading_time': total_reading_time,
+            'recent_articles': recent_articles,
+            'current_year': datetime.now().year,
+            'build_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+
+        content = template.render(**context)
+
+        groups_dir = build_dir / "articles" / "groups"
+        groups_dir.mkdir(parents=True, exist_ok=True)
+
+        (groups_dir / "index.html").write_text(content, encoding='utf-8')
+        print("✓ 生成: /articles/groups/index.html")
+        return True
+
+    except Exception as e:
+        print(f"✗ 生成所有分组页面失败: {e}")
+        return False
+
+def generate_all_articles_page(env, all_articles, groups_info, build_dir):
+    """生成所有文章页面"""
+    try:
+        template = env.get_template("all_articles.html")
+
+        # 计算统计数据
+        total_words = sum(a['word_count'] for a in all_articles)
+        total_reading_time = sum(a['reading_time'] for a in all_articles)
+
+        context = {
+            'title': '所有文章',
+            'all_articles': all_articles,
+            'groups_info': groups_info,
+            'total_articles': len(all_articles),
+            'total_words': total_words,
+            'total_reading_time': total_reading_time,
+            'group_count': len(groups_info),
+            'current_year': datetime.now().year,
+            'build_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+
+        content = template.render(**context)
+
+        articles_dir = build_dir / "articles"
+        articles_dir.mkdir(parents=True, exist_ok=True)
+
+        (articles_dir / "index.html").write_text(content, encoding='utf-8')
+        print("✓ 生成: /articles/index.html")
+        return True
+
+    except Exception as e:
+        print(f"✗ 生成所有文章页面失败: {e}")
+        return False
+
+def generate_group_pages(env, articles_by_group, build_dir):
+    """生成分组页面"""
+    temp_articles_dir = Path("temp_articles")
+
+    for group_name, articles in articles_by_group.items():
+        try:
+            # 分组首页
+            total_words = sum(a['word_count'] for a in articles)
+            total_reading_time = sum(a['reading_time'] for a in articles)
+            latest_date = max((a['date'] for a in articles), default='')
+
+            template = env.get_template("group_index.html")
+            context = {
+                'title': f'{group_name} - 文章分类' if group_name != 'default' else '默认分组 - 文章分类',
+                'group_name': group_name,
+                'current_group': group_name,
+                'articles': articles,
+                'total_words': total_words,
+                'total_reading_time': total_reading_time,
+                'latest_date': latest_date,
+                'current_year': datetime.now().year,
+                'build_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
+
+            group_dir = build_dir / "articles" / "groups" / group_name
+            group_dir.mkdir(parents=True, exist_ok=True)
+
+            (group_dir / "index.html").write_text(template.render(**context), encoding='utf-8')
+            print(f"✓ 生成: /articles/groups/{group_name}/")
+
+            # 分组内的文章详情页
+            generate_article_pages(env, articles, group_name, group_dir, temp_articles_dir)
+
+        except Exception as e:
+            print(f"✗ 生成分组 '{group_name}' 页面失败: {e}")
+
+def generate_article_pages(env, articles, group_name, group_dir, temp_articles_dir):
+    """生成文章详情页面"""
+    for i, article in enumerate(articles):
+        try:
             # 读取Markdown内容
             md_file = temp_articles_dir / article['group'] / article['filename']
             if not md_file.exists():
@@ -378,22 +377,113 @@ def build_with_templates():
                 article_file.write_text(template.render(**context), encoding='utf-8')
                 print(f"  → 生成: /articles/groups/{group_name}/{article['html_name']}")
 
-    # 6. 清理
+        except Exception as e:
+            print(f"✗ 生成文章 '{article['title']}' 页面失败: {e}")
+
+def copy_static_files(build_dir):
+    """复制静态文件"""
+    source_dir = Path("site")
+
+    # 要复制的文件列表
+    static_files = [
+        ("style.css", "CSS样式文件"),
+        ("404.html", "404页面"),
+        ("favicon.ico", "网站图标")
+    ]
+
+    for filename, description in static_files:
+        file_path = source_dir / filename
+        if file_path.exists():
+            try:
+                shutil.copy2(file_path, build_dir / filename)
+                print(f"✓ 复制: {filename} ({description})")
+            except Exception as e:
+                print(f"⚠ 复制 {filename} 失败: {e}")
+        else:
+            print(f"⚠ {filename} 不存在，跳过复制")
+
+
+def build_with_templates():
+    """使用模板构建站点"""
+    print("🚀 开始模板构建...")
+    print("=" * 50)
+
+    # 初始化模板环境
+    env = init_jinja()
+    build_dir = Path("site/_site")
+
+    # 清理构建目录
+    if build_dir.exists():
+        shutil.rmtree(build_dir)
+    build_dir.mkdir(parents=True)
+
+    # 1. 读取配置文件
+    print("📄 读取配置文件...")
+    try:
+        with open("config.json", "r", encoding="utf-8") as f:
+            config = json.load(f)
+        print("✓ 配置文件读取成功")
+    except Exception as e:
+        print(f"✗ 读取配置文件失败: {e}")
+        return False
+
+    # 2. 生成主页
+    print("\n🏠 生成主页...")
+    if not generate_home_page(env, config, build_dir):
+        print("⚠ 主页生成失败，继续构建其他页面")
+
+    # 3. 拉取文章
+    print("\n📥 拉取文章...")
+    all_articles, articles_by_group = fetch_articles()
+
+    if all_articles:
+        print(f"✓ 拉取完成: {len(all_articles)} 篇文章，{len(articles_by_group)} 个分组")
+
+        # 4. 准备分组信息
+        print("\n📊 准备分组信息...")
+        groups_info = {}
+        for group_name, articles in articles_by_group.items():
+            total_words = sum(a['word_count'] for a in articles)
+            total_reading_time = sum(a['reading_time'] for a in articles)
+            latest_date = max((a['date'] for a in articles), default='')
+
+            groups_info[group_name] = {
+                'count': len(articles),
+                'total_words': total_words,
+                'total_reading_time': total_reading_time,
+                'latest_date': latest_date,
+                'articles': articles,
+                'description': f"{group_name} 分类的文章"
+            }
+
+        # 5. 生成所有分组页面
+        print("\n📁 生成所有分组页面...")
+        generate_all_groups_page(env, groups_info, build_dir)
+
+        # 6. 生成所有文章页面
+        print("\n📄 生成所有文章页面...")
+        generate_all_articles_page(env, all_articles, groups_info, build_dir)
+
+        # 7. 生成分组页面
+        print("\n📂 生成分组页面...")
+        generate_group_pages(env, articles_by_group, build_dir)
+    else:
+        print("⚠ 没有文章可构建，跳过文章相关页面")
+
+    # 8. 复制静态文件
+    print("\n📋 复制静态文件...")
+    copy_static_files(build_dir)
+
+    # 9. 创建.nojekyll
+    (build_dir / ".nojekyll").touch()
+    print("✓ 创建: .nojekyll")
+
+    # 10. 清理临时文件
+    print("\n🧹 清理临时文件...")
+    temp_articles_dir = Path("temp_articles")
     if temp_articles_dir.exists():
         shutil.rmtree(temp_articles_dir)
-
-    # 7. 创建.nojekyll
-    (build_dir / ".nojekyll").touch()
-
-    # 8. 复制配置文件到网站根目录
-    root_files = ["CNAME", "config.json"]
-    for filename in root_files:
-        file_path = Path(filename)
-        if file_path.exists():
-            shutil.copy2(file_path, build_dir / filename)
-            print(f"✓ 复制: {filename} -> {build_dir}/{filename}")
-        else:
-            print(f"⚠ {filename} 文件不存在")
+        print("✓ 清理: temp_articles/")
 
     print("\n" + "=" * 50)
     print("🎉 模板构建完成!")
@@ -404,14 +494,32 @@ def build_with_templates():
     print("=" * 50)
     return True
 
+
 def main():
+    """主函数"""
     try:
-        return build_with_templates()
+        # 检查必要的目录和文件
+        if not Path("config.json").exists():
+            print("❌ 错误: config.json 不存在")
+            return False
+
+        if not Path("templates").exists():
+            print("⚠ 警告: templates 目录不存在，尝试创建...")
+            Path("templates").mkdir(exist_ok=True)
+            Path("templates/home").mkdir(exist_ok=True)
+            Path("templates/articles").mkdir(exist_ok=True)
+            print("⚠ 请确保模板文件已放置在 templates/home/ 和 templates/articles/ 目录中")
+
+        # 执行构建
+        success = build_with_templates()
+        return success
+
     except Exception as e:
         print(f"\n❌ 构建失败: {e}")
         import traceback
         traceback.print_exc()
         return False
+
 
 if __name__ == "__main__":
     success = main()

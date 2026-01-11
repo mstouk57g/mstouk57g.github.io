@@ -2,21 +2,7 @@
   "site": {
     "title": "代码之旅",
     "defaultTitle": "个人主页",
-    "titleOptions": [
-      "代码之旅",
-      "数字空间",
-      "技术探索者",
-      "创造与分享",
-      "开发者之路"
-    ],
     "subtitle": "探索、创造、分享",
-    "subtitleOptions": [
-      "探索、创造、分享",
-      "代码改变世界",
-      "持续学习，不断进步",
-      "技术驱动未来",
-      "将想法变为现实"
-    ],
     "name": "ntcho & ConiMite",
     "username": "mstouk57g",
     "description": "欢迎来到我的个人空间！这里是我分享技术项目、学习笔记和创作成果的地方。"
