@@ -44,7 +44,7 @@
       "text": "技术笔记",
       "icon": "fas fa-blog",
       "type": "link",
-      "url": "https://mstouk57g.colchicum.moe/articles",
+      "url": "https://mstouk57g.colchicum.moe/articles/groups",
       "target": "_blank"
     },
     {
@@ -85,7 +85,7 @@
   ],
 
   "background": {
-    "apiUrl": "https://www.loliapi.com/acg/pc/?type=json",
+    "apiUrl": "https://www.loliapi.com/acg/?type=json",
     "defaultBackground": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
   },
 
