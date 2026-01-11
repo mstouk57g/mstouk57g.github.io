@@ -3,9 +3,6 @@ name: Build and Deploy Static Site
 on:
   push:
     branches: [ main, articles ]
-    paths-ignore:
-      - '**/*.md'
-      - 'site/articles/**'
   workflow_dispatch:
 
 jobs:
