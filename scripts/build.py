@@ -6,6 +6,7 @@
 import os
 import re
 import shutil
+import requests
 import subprocess
 from pathlib import Path
 import sys
@@ -426,6 +427,36 @@ def build_with_templates():
     except Exception as e:
         print(f"✗ 读取配置文件失败: {e}")
         return False
+
+    # 更新config配置信息（从GitHub API）
+    print("\n🌐 从GitHub API获取用户信息...")
+    try:
+        username = config['site']['username']
+        api_url = f"https://api.github.com/users/{username}"
+
+        # 使用 requests 调用 GitHub API
+        response = requests.get(api_url, headers={
+            'User-Agent': 'Mozilla/5.0',
+            'Accept': 'application/vnd.github.v3+json'
+        }, timeout=10)
+
+        if response.status_code == 200:
+            data = response.json()
+
+            # 更新配置
+            if data.get('name'):
+                config['site']['name'] = data['name']
+                print(f"✓ 更新 name: {data['name']}")
+
+            if data.get('bio'):
+                config['site']['subtitle'] = data['bio']
+                print(f"✓ 更新 subtitle: {data['bio'][:50]}...")
+
+        else:
+            print(f"⚠ GitHub API 返回状态码: {response.status_code}")
+    except Exception as e:
+        print(f"⚠ 从GitHub API获取信息失败: {e}")
+        print("⚠ 使用配置文件中的原始信息")
 
     # 2. 生成主页
     print("\n🏠 生成主页...")
