@@ -400,6 +400,16 @@ body {
     pointer-events: none; /* 防止遮罩层干扰点击事件 */
 }
 
+main {
+    position: relative;
+    z-index: 20;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
 /* iOS平滑滚动 */
 @media (max-width: 768px) {
     body {
