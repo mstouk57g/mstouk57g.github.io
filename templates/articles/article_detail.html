@@ -97,7 +97,7 @@
 
         <div class="mb-4 md:mb-0 text-center">
             <div class="flex items-center">
-                <i class="fas fa-file-word text-xl mr-3 text-purple-300"></i>
+                <i class="fas fa-file-word text-xl mr-3 text-white"></i>
                 <div>
                     <div class="font-bold">{{ article.word_count }} 字</div>
                     <div class="text-sm opacity-70">阅读约需 {{ article.reading_time }} 分钟</div>
@@ -107,7 +107,7 @@
 
         <div class="text-center md:text-right">
             <div class="flex items-center">
-                <i class="fas fa-code-commit text-xl mr-3 text-purple-300"></i>
+                <i class="fas fa-code-commit text-xl mr-3 text-white"></i>
                 <div>
                     <div class="font-bold">{{ article.commit_count }} 次提交</div>
                     <div class="text-sm opacity-70">最后更新于 {{ article.date }}</div>
@@ -123,7 +123,7 @@
     <a href="/articles/groups/{{ article.group }}/{{ prev_article.html_name }}"
        class="flex-1 glass-card p-4 rounded-xl hover:bg-white hover:bg-opacity-10 transition group">
         <div class="flex items-center">
-            <div class="w-10 h-10 rounded-full flex items-center justify-center mr-3">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center mr-3 border border-gray-600">
                 <i class="fas fa-chevron-left"></i>
             </div>
             <div class="flex-1 min-w-0">
@@ -146,7 +146,7 @@
                 <div class="text-sm opacity-70 mb-1">下一篇</div>
                 <div class="font-bold truncate">{{ next_article.title }}</div>
             </div>
-            <div class="w-10 h-10 rounded-full flex items-center justify-center ml-3">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center ml-3 border border-gray-600">
                 <i class="fas fa-chevron-right"></i>
             </div>
         </div>
