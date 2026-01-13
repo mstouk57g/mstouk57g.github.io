@@ -33,32 +33,44 @@
       "target": "_blank"
     },
     {
-      "id": "contact",
-      "text": "联系我",
-      "icon": "fas fa-envelope",
+      "id": "links",
+      "text": "友情链接",
+      "icon": "fas fa-link",
       "type": "modal",
-      "modalTitle": "联系我",
-      "modalContent": "GitHub: <a href='https://github.com/mstouk57g' class='underline' target='_blank'>mstouk57g</a><br>• Email: mstouk57g@colchicum.com"
+      "modalTitle": "友情链接",
+      "modalContent": "HugoAura: <a href='https://docs.aurax.cc/' class='underline' target='_blank'>HugoAura Docs</a><br>"
     }
   ],
 
   "socialLinks": [
     {
-      "platform": "twitter",
-      "icon": "fab fa-twitter",
-      "url": "https://twitter.com",
+      "platform": "GitHub",
+      "icon": "fab fa-github",
+      "url": "https://github.com/mstouk57g",
       "color": "hover:text-blue-400"
     },
     {
-      "platform": "linkedin",
-      "icon": "fab fa-linkedin",
-      "url": "https://linkedin.com",
+      "platform": "QQ",
+      "icon": "fa-qq",
+      "url": "http://wpa.qq.com/msgrd?v=3&uin=3776473661&site=qq&menu=yes",
       "color": "hover:text-blue-600"
     },
     {
-      "platform": "stackoverflow",
-      "icon": "fab fa-stack-overflow",
-      "url": "https://stackoverflow.com",
+      "platform": "BiliBili",
+      "icon": "fab fa-bilibili",
+      "url": "https://space.bilibili.com/3493092334242540",
+      "color": "hover:text-orange-500"
+    },
+    {
+      "platform": "Youtube",
+      "icon": "fab fa-youtube",
+      "url": "https://youtube.com/@ntcho-ge9gx",
+      "color": "hover:text-orange-500"
+    },
+    {
+      "platform": "X",
+      "icon": "fab fa-x-twitter",
+      "url": "https://x.com/ntcho788787",
       "color": "hover:text-orange-500"
     },
     {
