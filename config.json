@@ -51,7 +51,7 @@
     },
     {
       "platform": "QQ",
-      "icon": "fa-qq",
+      "icon": "fab-qq",
       "url": "http://wpa.qq.com/msgrd?v=3&uin=3776473661&site=qq&menu=yes",
       "color": "hover:text-blue-600"
     },
