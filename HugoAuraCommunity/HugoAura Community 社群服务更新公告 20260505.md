@@ -2,7 +2,7 @@
 HugoAura Community 相关服务现在均已恢复正常。
 同时，这些服务中有一些新的变动。
 
-![a6fa86b26b2588014a6efbaa0a2270ef_720](D:\Users\CreeperAWA\Documents\Tencent Files\3116508378\nt_qq\nt_data\Pic\2026-05\Thumb\a6fa86b26b2588014a6efbaa0a2270ef_720.jpg)
+<img width="10760" height="3564" alt="IMG_3901" src="https://github.com/user-attachments/assets/a15c92e6-b1c8-4383-9818-c3f4bcfda971" />
 
 ## 服务运营方面更变与多节点并存
 
@@ -52,9 +52,9 @@ Github 登录由于原先的 OAuth 应用程式属于 TianMiao 而非 HugoAura�
 
 访问后将会自动尝试连接机器人和进行所有的 CheckIn 站点测速，并告知结果
 点击任意一 CheckIn 服务卡片可以直接跳转到对应的地址。
-推荐访问地址：https://agcf-hgck.colchicum.moe/checkIn
+推荐访问地址（节点二，这个好像最稳定）：https://agcf-hgck.colchicum.moe/checkIn
 
-![671c05a70ab1d966246b5f6e99428dc6_720](D:\Users\CreeperAWA\Documents\Tencent Files\3116508378\nt_qq\nt_data\Pic\2026-05\Thumb\671c05a70ab1d966246b5f6e99428dc6_720.jpg)
+<img width="10000" height="5676" alt="IMG_3900" src="https://github.com/user-attachments/assets/23b9fd28-fc22-455a-8177-1e94ca0acf4b" />
 
 ## 试题生成策略更变
 
@@ -62,14 +62,12 @@ Github 登录由于原先的 OAuth 应用程式属于 TianMiao 而非 HugoAura�
 
 具体步骤可以参照下方海报
 
-![073d693198382a0022485ab709e45bfd_720](D:\Users\CreeperAWA\Documents\Tencent Files\3116508378\nt_qq\nt_data\Pic\2026-05\Thumb\073d693198382a0022485ab709e45bfd_720.jpg)
+<img width="10000" height="5676" alt="IMG_3781" src="https://github.com/user-attachments/assets/e426ee62-e73a-4c19-9bfc-5af2fd7eec09" />
 
 另外，请各位管理员注意。由于该试题生成策略需要在答题之前发送入群申请。为防止管理员误操作导致不该放进来的人被放进来，本公告发布之后，除 HugoAura Member（即群聊「雨光之环中央指挥部」的管理员）之外的所有管理员将会被吊销接受入群申请的资格。造成不便，还请理解
 该策略并不会立马生效，在权限吊销之前，请不要对任何「雨光之环用户交流群」的入群申请进行批准或拒绝操作。
 
-本次更新内容公告结束
-
-。如有任何问题可以找任意一 HugoAura Member 进行询问。
+本次更新内容公告结束，如有任何问题可以找任意一 HugoAura Member 进行询问。
 
 <p align="right">2026 年 5 月 5 日</p>
 
