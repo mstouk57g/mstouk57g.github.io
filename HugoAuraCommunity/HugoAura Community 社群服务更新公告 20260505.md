@@ -1,3 +1,5 @@
+HugoAua Community 社群服务更新公告 (20260505)
+
 各位同学，下午好。
 
 HugoAura Community 相关服务现在均已恢复正常。
